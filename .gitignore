@@ -1,0 +1,86 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+ENV/
+
+# Configuración sensible
+.env
+.env.*
+!.env.example
+
+# =========================
+# Build / packaging
+# =========================
+build/
+dist/
+*.spec
+
+# PyInstaller temporales / reportes
+*.toc
+*.pyz
+*.pkg
+*.exe
+*.html
+warn-*.txt
+xref-*.html
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Testing / coverage
+# =========================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# =========================
+# Type check / lint caches
+# =========================
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Archivos temporales
+# =========================
+*.tmp
+*.bak
+
+# =========================
+# Base de datos local opcional
+# =========================
+*.sqlite3
+*.db

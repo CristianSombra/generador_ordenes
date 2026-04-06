@@ -1,0 +1,17 @@
+import pandas as pd
+
+
+def obtener_datos_profesional_desde_excel(ruta_archivo, titular):
+    df = pd.read_excel(ruta_archivo)
+
+    columnas_requeridas = ["Titular", "Observaciones", "Operación Nro.", "Fecha y Hora", "Importe"]
+
+    for columna in columnas_requeridas:
+        if columna not in df.columns:
+            raise ValueError(f"El archivo no contiene la columna '{columna}'.")
+
+    df["Titular"] = df["Titular"].astype(str).str.strip()
+
+    df_filtrado = df[df["Titular"] == titular].copy()
+
+    return df_filtrado
