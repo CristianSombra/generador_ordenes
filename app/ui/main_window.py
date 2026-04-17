@@ -1,5 +1,7 @@
 import pandas as pd
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QListWidget, QHBoxLayout, QTableWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QListWidget, QHBoxLayout, QTableWidget, QTableWidgetItem, QGridLayout, QHeaderView
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt
 from app.services.excel_service import obtener_titulares_desde_excel
 from app.services.data_service import obtener_datos_profesional_desde_excel, obtener_categoria_del_profesional
 from app.utils.mes_utils import obtener_texto_correspondiente_a_mes
@@ -16,7 +18,22 @@ class MainWindow(QWidget):
 
         layout = QVBoxLayout()
 
+        logo_layout = QHBoxLayout()
+
+        logo_label = QLabel()
+        pixmap = QPixmap("app/assets/logo.png")
+        logo_label.setPixmap(
+            pixmap.scaledToHeight(65, Qt.SmoothTransformation)
+        )
+        logo_label.setStyleSheet("background: transparent;")
+        logo_layout.addWidget(logo_label)
+        logo_layout.addStretch()
+
+        layout.addLayout(logo_layout)
+
         titulo = QLabel("Generador de Órdenes de Pago")
+        titulo.setAlignment(Qt.AlignCenter)
+        titulo.setStyleSheet("font-size: 18px; font-weight: bold; margin-top: 8px; margin-bottom: 8px;")
         layout.addWidget(titulo)
 
         periodo_layout = QHBoxLayout()
@@ -41,9 +58,22 @@ class MainWindow(QWidget):
         layout.addWidget(self.btn_importar)
         self.btn_importar.clicked.connect(self.importar_archivo)
 
+        listas_layout = QGridLayout()
+
+        self.label_a_procesar = QLabel("Profesionales a procesar")
+        listas_layout.addWidget(self.label_a_procesar, 0, 0)
+
+        self.label_procesados = QLabel("Profesionales procesados")
+        listas_layout.addWidget(self.label_procesados, 0, 1)
+
         self.lista_titulares = QListWidget()
         self.lista_titulares.itemClicked.connect(self.cargar_datos_profesional)
-        layout.addWidget(self.lista_titulares)
+        listas_layout.addWidget(self.lista_titulares, 1, 0)
+
+        self.lista_procesados = QListWidget()
+        listas_layout.addWidget(self.lista_procesados, 1, 1)
+
+        layout.addLayout(listas_layout)
 
         self.tabla_datos = QTableWidget()
         self.tabla_datos.setColumnCount(4)
@@ -53,6 +83,12 @@ class MainWindow(QWidget):
             "Fecha de transferencia",
             "Importe"
         ])
+
+        self.tabla_datos.setColumnWidth(0, 220)
+        self.tabla_datos.setColumnWidth(1, 180)
+        self.tabla_datos.setColumnWidth(2, 180)
+        self.tabla_datos.setColumnWidth(3, 120)
+
         layout.addWidget(self.tabla_datos)
 
         self.label_categoria = QLabel("Categoría: ")
@@ -94,6 +130,7 @@ class MainWindow(QWidget):
             if archivo.lower().endswith((".xlsx", ".xls")):
                 titulares = obtener_titulares_desde_excel(archivo)
                 self.lista_titulares.clear()
+                self.lista_procesados.clear()
 
                 for titular in titulares:
                     self.lista_titulares.addItem(titular)
@@ -178,3 +215,9 @@ class MainWindow(QWidget):
         )
 
         print("PDF generado:", ruta)
+
+        fila_actual = self.lista_titulares.currentRow()
+
+        if fila_actual >= 0:
+            item = self.lista_titulares.takeItem(fila_actual)
+            self.lista_procesados.addItem(item.text())
