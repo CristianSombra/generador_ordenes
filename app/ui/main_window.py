@@ -1,7 +1,7 @@
 import pandas as pd
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QListWidget, QHBoxLayout, QTableWidget, QTableWidgetItem
 from app.services.excel_service import obtener_titulares_desde_excel
-from app.services.data_service import obtener_datos_profesional_desde_excel
+from app.services.data_service import obtener_datos_profesional_desde_excel, obtener_categoria_del_profesional
 from app.utils.mes_utils import obtener_texto_correspondiente_a_mes
 from app.utils.formato_utils import formatear_fecha, formatear_importe
 from app.services.pdf_service import generar_pdf as generar_pdf_archivo
@@ -55,6 +55,24 @@ class MainWindow(QWidget):
         ])
         layout.addWidget(self.tabla_datos)
 
+        self.label_categoria = QLabel("Categoría: ")
+        layout.addWidget(self.label_categoria)
+
+        self.input_descripcion = QLineEdit()
+        self.input_descripcion.setPlaceholderText("Descripción")
+        self.input_descripcion.setText("Prestaciones profesionales")
+        layout.addWidget(self.input_descripcion)
+
+        self.input_tipo_transaccion = QLineEdit()
+        self.input_tipo_transaccion.setPlaceholderText("Tipo de transacción")
+        self.input_tipo_transaccion.setText("TRANSFERENCIA")
+        layout.addWidget(self.input_tipo_transaccion)
+
+        self.input_fecha_procesado = QLineEdit()
+        self.input_fecha_procesado.setPlaceholderText("Fecha Procesado")
+        self.input_fecha_procesado.setText("16/04/2026")
+        layout.addWidget(self.input_fecha_procesado)
+
         self.btn_pdf = QPushButton("Generar PDF")
         layout.addWidget(self.btn_pdf)
         self.btn_pdf.clicked.connect(self.generar_pdf)
@@ -84,6 +102,8 @@ class MainWindow(QWidget):
         titular = item.text()
 
         df_filtrado = obtener_datos_profesional_desde_excel(self.ruta_archivo, titular)
+        self.categoria_actual = obtener_categoria_del_profesional(df_filtrado)
+        self.label_categoria.setText(f"Categoría: {self.categoria_actual}")
 
         self.tabla_datos.setRowCount(len(df_filtrado))
 
@@ -115,6 +135,10 @@ class MainWindow(QWidget):
         titular = item.text()
         desde = self.input_desde.text()
         hasta = self.input_hasta.text()
+        categoria = getattr(self, "categoria_actual", "")
+        descripcion = self.input_descripcion.text()
+        tipo_transaccion = self.input_tipo_transaccion.text()
+        fecha_procesado = self.input_fecha_procesado.text()
 
         datos = []
 
@@ -131,8 +155,26 @@ class MainWindow(QWidget):
                 "importe": item_importe.text() if item_importe else "",
             })
 
-        ruta = f"{titular}.pdf"
+        ruta, _ = QFileDialog.getSaveFileName(
+            self,
+            "Guardar PDF",
+            f"{titular}.pdf",
+            "PDF (*.pdf)"
+        )
 
-        generar_pdf_archivo(ruta, titular, desde, hasta, datos)
+        if not ruta:
+            return
+
+        generar_pdf_archivo(
+            ruta,
+            titular,
+            desde,
+            hasta,
+            datos,
+            categoria,
+            descripcion,
+            tipo_transaccion,
+            fecha_procesado
+        )
 
         print("PDF generado:", ruta)

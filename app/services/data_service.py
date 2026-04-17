@@ -4,7 +4,7 @@ import pandas as pd
 def obtener_datos_profesional_desde_excel(ruta_archivo, titular):
     df = pd.read_excel(ruta_archivo)
 
-    columnas_requeridas = ["Titular", "Observaciones", "Operación Nro.", "Fecha y Hora", "Importe"]
+    columnas_requeridas = ["Titular", "Observaciones", "Operación Nro.", "Fecha y Hora", "Importe", "Categoría"]
 
     for columna in columnas_requeridas:
         if columna not in df.columns:
@@ -15,3 +15,22 @@ def obtener_datos_profesional_desde_excel(ruta_archivo, titular):
     df_filtrado = df[df["Titular"] == titular].copy()
 
     return df_filtrado
+
+
+def obtener_categoria_del_profesional(df_filtrado):
+    if df_filtrado.empty:
+        return ""
+
+    categorias = (
+        df_filtrado["Categoría"]
+        .dropna()
+        .astype(str)
+        .str.strip()
+        .unique()
+        .tolist()
+    )
+
+    if not categorias:
+        return ""
+
+    return categorias[0]
