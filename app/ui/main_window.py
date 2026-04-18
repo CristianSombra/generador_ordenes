@@ -1,5 +1,6 @@
 import pandas as pd
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QListWidget, QHBoxLayout, QTableWidget, QTableWidgetItem, QGridLayout, QHeaderView
+import os
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QListWidget, QHBoxLayout, QTableWidget, QTableWidgetItem, QGridLayout, QHeaderView, QMessageBox
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from app.services.excel_service import obtener_titulares_desde_excel
@@ -109,9 +110,20 @@ class MainWindow(QWidget):
         self.input_fecha_procesado.setText("16/04/2026")
         layout.addWidget(self.input_fecha_procesado)
 
+        self.btn_ruta_guardado = QPushButton("Elegir ruta de guardado")
+        layout.addWidget(self.btn_ruta_guardado)
+        self.btn_ruta_guardado.clicked.connect(self.seleccionar_ruta_guardado)
+
+        self.label_ruta_guardado = QLabel("Ruta de guardado: No seleccionada")
+        layout.addWidget(self.label_ruta_guardado)
+
         self.btn_pdf = QPushButton("Generar PDF")
+        self.btn_pdf.setEnabled(False)
         layout.addWidget(self.btn_pdf)
+
         self.btn_pdf.clicked.connect(self.generar_pdf)
+
+        self.ruta_guardado = ""
 
         self.setLayout(layout)
 
@@ -131,6 +143,9 @@ class MainWindow(QWidget):
                 titulares = obtener_titulares_desde_excel(archivo)
                 self.lista_titulares.clear()
                 self.lista_procesados.clear()
+                self.tabla_datos.setRowCount(0)
+                self.label_categoria.setText("Categoría: ")
+                self.btn_pdf.setEnabled(False)
 
                 for titular in titulares:
                     self.lista_titulares.addItem(titular)
@@ -141,6 +156,7 @@ class MainWindow(QWidget):
         df_filtrado = obtener_datos_profesional_desde_excel(self.ruta_archivo, titular)
         self.categoria_actual = obtener_categoria_del_profesional(df_filtrado)
         self.label_categoria.setText(f"Categoría: {self.categoria_actual}")
+        self.btn_pdf.setEnabled(True)
 
         self.tabla_datos.setRowCount(len(df_filtrado))
 
@@ -158,6 +174,16 @@ class MainWindow(QWidget):
             self.tabla_datos.setItem(fila, 1, QTableWidgetItem(operacion))
             self.tabla_datos.setItem(fila, 2, QTableWidgetItem(fecha_hora_texto))
             self.tabla_datos.setItem(fila, 3, QTableWidgetItem(importe_texto))
+
+    def seleccionar_ruta_guardado(self):
+        carpeta = QFileDialog.getExistingDirectory(
+            self,
+            "Seleccionar carpeta de guardado"
+        )
+
+        if carpeta:
+            self.ruta_guardado = carpeta
+            self.label_ruta_guardado.setText(f"Ruta de guardado: {carpeta}")
 
     def generar_pdf(self):
         if not hasattr(self, "ruta_archivo"):
@@ -192,15 +218,12 @@ class MainWindow(QWidget):
                 "importe": item_importe.text() if item_importe else "",
             })
 
-        ruta, _ = QFileDialog.getSaveFileName(
-            self,
-            "Guardar PDF",
-            f"{titular}.pdf",
-            "PDF (*.pdf)"
-        )
-
-        if not ruta:
+        if not self.ruta_guardado:
+            QMessageBox.warning(self, "Ruta no seleccionada", "Primero seleccioná una ruta de guardado.")
             return
+
+        nombre_archivo = f"{titular}.pdf"
+        ruta = os.path.join(self.ruta_guardado, nombre_archivo)
 
         generar_pdf_archivo(
             ruta,
@@ -221,3 +244,9 @@ class MainWindow(QWidget):
         if fila_actual >= 0:
             item = self.lista_titulares.takeItem(fila_actual)
             self.lista_procesados.addItem(item.text())
+
+        self.tabla_datos.setRowCount(0)
+        self.label_categoria.setText("Categoría: ")
+        self.btn_pdf.setEnabled(False)
+
+        QMessageBox.information(self, "PDF generado", "El PDF se generó correctamente.")

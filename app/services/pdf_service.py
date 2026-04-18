@@ -24,9 +24,9 @@ def generar_pdf(ruta_salida, titular, desde, hasta, datos, categoria, descripcio
         c.drawImage(
             ruta_logo,
             2 * cm,
-            height - 4.2 * cm,
-            width=4 * cm,
-            height=3 * cm,
+            height - 4.5 * cm,
+            width=5 * cm,
+            height=3.8 * cm,
             preserveAspectRatio=True,
             mask='auto'
         )
