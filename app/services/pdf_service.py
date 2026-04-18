@@ -2,6 +2,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 import os
+from app.utils.path_utils import obtener_ruta_recurso
 
 
 def generar_pdf(ruta_salida, titular, desde, hasta, datos, categoria, descripcion, tipo_transaccion, fecha_procesado):
@@ -19,7 +20,7 @@ def generar_pdf(ruta_salida, titular, desde, hasta, datos, categoria, descripcio
     # -------------------------
     # LOGO
     # -------------------------
-    ruta_logo = "app/assets/logo.png"
+    ruta_logo = obtener_ruta_recurso("app/assets/logo.png")
     if os.path.exists(ruta_logo):
         c.drawImage(
             ruta_logo,
@@ -126,8 +127,8 @@ def generar_pdf(ruta_salida, titular, desde, hasta, datos, categoria, descripcio
     # -------------------------
     y_firma = 3 * cm
 
-    ruta_firma_yanina = "app/assets/firma_yanina.png"
-    ruta_firma_cristian = "app/assets/firma_cristian.png"
+    ruta_firma_yanina = obtener_ruta_recurso("app/assets/firma_yanina.png")
+    ruta_firma_cristian = obtener_ruta_recurso("app/assets/firma_cristian.png")
 
     if os.path.exists(ruta_firma_yanina):
         c.drawImage(

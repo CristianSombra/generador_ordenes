@@ -8,6 +8,7 @@ from app.services.data_service import obtener_datos_profesional_desde_excel, obt
 from app.utils.mes_utils import obtener_texto_correspondiente_a_mes
 from app.utils.formato_utils import formatear_fecha, formatear_importe
 from app.services.pdf_service import generar_pdf as generar_pdf_archivo
+from app.utils.path_utils import obtener_ruta_recurso
 
 
 class MainWindow(QWidget):
@@ -22,7 +23,7 @@ class MainWindow(QWidget):
         logo_layout = QHBoxLayout()
 
         logo_label = QLabel()
-        pixmap = QPixmap("app/assets/logo.png")
+        pixmap = QPixmap(obtener_ruta_recurso("app/assets/logo.png"))
         logo_label.setPixmap(
             pixmap.scaledToHeight(65, Qt.SmoothTransformation)
         )
