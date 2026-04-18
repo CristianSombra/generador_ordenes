@@ -52,7 +52,7 @@ def generar_pdf(ruta_salida, titular, desde, hasta, datos, categoria, descripcio
     col1 = 2 * cm
     col2 = 7 * cm
     col3 = 12 * cm
-    col4 = 16 * cm
+    col4 = 17 * cm
     tabla_ancho = width - 4 * cm
     fila_alto = 0.6 * cm
 
@@ -60,11 +60,17 @@ def generar_pdf(ruta_salida, titular, desde, hasta, datos, categoria, descripcio
     c.setLineWidth(0.6)
     c.rect(2 * cm, start_y - fila_alto, tabla_ancho, fila_alto)
 
+    ancho_col1 = col2 - col1
+    ancho_col2 = col3 - col2
+    ancho_col3 = col4 - col3
+    ancho_col4 = (2 * cm + tabla_ancho) - col4
+
     c.setFont("Helvetica-Bold", 8)
-    c.drawCentredString(col1 + 2.0 * cm, start_y - 0.4 * cm, "MES")
-    c.drawCentredString(col2 + 1.8 * cm, start_y - 0.4 * cm, "OPERACIÓN")
-    c.drawCentredString(col3 + 1.8 * cm, start_y - 0.4 * cm, "FECHA")
-    c.drawCentredString(col4 + 1.2 * cm, start_y - 0.4 * cm, "IMPORTE")
+
+    c.drawCentredString(col1 + ancho_col1 / 2, start_y - 0.4 * cm, "CORRESPONDIENTE A MES")
+    c.drawCentredString(col2 + ancho_col2 / 2, start_y - 0.4 * cm, "OPERACIÓN")
+    c.drawCentredString(col3 + ancho_col3 / 2, start_y - 0.4 * cm, "FECHA DE TRANSFERENCIA")
+    c.drawCentredString(col4 + ancho_col4 / 2, start_y - 0.4 * cm, "IMPORTE")
 
     # líneas verticales encabezado
     c.line(col2, start_y, col2, start_y - fila_alto)
@@ -84,7 +90,7 @@ def generar_pdf(ruta_salida, titular, desde, hasta, datos, categoria, descripcio
         c.line(col3, y, col3, y_siguiente)
         c.line(col4, y, col4, y_siguiente)
 
-        c.drawString(col1 + 0.1 * cm, y - 0.4 * cm, str(fila["mes"]))
+        c.drawString(col1 + 0.2 * cm, y - 0.5 * cm, str(fila["mes"]))
         c.drawCentredString(col2 + 1.8 * cm, y - 0.4 * cm, str(fila["operacion"]))
         c.drawCentredString(col3 + 1.8 * cm, y - 0.4 * cm, str(fila["fecha"]))
         c.drawRightString(width - 2.2 * cm, y - 0.4 * cm, str(fila["importe"]))
