@@ -34,3 +34,31 @@ def obtener_categoria_del_profesional(df_filtrado):
         return ""
 
     return categorias[0]
+
+
+def obtener_categorias_del_profesional(df_filtrado):
+    if df_filtrado.empty:
+        return []
+
+    categorias = (
+        df_filtrado["Categoría"]
+        .dropna()
+        .astype(str)
+        .str.strip()
+        .unique()
+        .tolist()
+    )
+
+    return categorias
+
+
+def filtrar_datos_por_categoria(df_filtrado, categoria):
+    if df_filtrado.empty:
+        return df_filtrado.copy()
+
+    return df_filtrado[
+        df_filtrado["Categoría"]
+        .fillna("")
+        .astype(str)
+        .str.strip() == categoria.strip()
+    ].copy()
