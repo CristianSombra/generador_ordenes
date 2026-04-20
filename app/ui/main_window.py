@@ -19,6 +19,11 @@ class FechaTableWidgetItem(QTableWidgetItem):
             return fecha_self < fecha_other
 
         return super().__lt__(other)
+    
+def sanitizar_nombre_archivo(texto):
+    for caracter in ['<', '>', ':', '"', '/', '\\', '|', '?', '*']:
+        texto = texto.replace(caracter, '-')
+    return texto.strip()
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -85,6 +90,10 @@ class MainWindow(QWidget):
         listas_layout.addWidget(self.lista_procesados, 1, 1)
 
         layout.addLayout(listas_layout)
+
+        self.btn_quitar = QPushButton("Quitar seleccionado")
+        layout.addWidget(self.btn_quitar)
+        self.btn_quitar.clicked.connect(self.quitar_profesional_seleccionado)
 
         self.tabla_datos = QTableWidget()
         self.tabla_datos.setColumnCount(4)
@@ -261,6 +270,27 @@ class MainWindow(QWidget):
 
         self.tabla_datos.setSortingEnabled(True)
 
+
+    def quitar_profesional_seleccionado(self):
+        item = self.lista_titulares.currentItem()
+        if not item:
+            QMessageBox.warning(self, "Sin selección", "Seleccioná un profesional de la lista 'A procesar'.")
+            return
+    
+        fila_actual = self.lista_titulares.currentRow()
+        nombre = item.text()
+    
+        self.lista_titulares.takeItem(fila_actual)
+    
+        self.tabla_datos.setRowCount(0)
+        self.label_categoria.setText("Categoría: ")
+        self.combo_categoria.clear()
+        self.combo_categoria.setEnabled(False)
+        self.btn_pdf.setEnabled(False)
+    
+        QMessageBox.information(self, "Profesional quitado", f"Se quitó a '{nombre}' de la lista 'A procesar'.")
+
+
     def seleccionar_ruta_guardado(self):
         carpeta = QFileDialog.getExistingDirectory(
             self,
@@ -308,9 +338,9 @@ class MainWindow(QWidget):
             QMessageBox.warning(self, "Ruta no seleccionada", "Primero seleccioná una ruta de guardado.")
             return
 
+        titular_archivo = titular.replace("/", "-").replace("\\", "-").strip()
         categoria_archivo = categoria.replace("/", "-").replace("\\", "-").strip()
-        nombre_archivo = f"{titular} ({categoria_archivo}).pdf"
-
+        nombre_archivo = f"{titular_archivo} ({categoria_archivo}).pdf"
         ruta = os.path.join(self.ruta_guardado, nombre_archivo)
 
         generar_pdf_archivo(
