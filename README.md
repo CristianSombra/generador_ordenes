@@ -18,7 +18,15 @@ Este sistema permite cargar una base de datos de movimientos financieros, selecc
   - Número de operación
   - Fecha de transferencia
   - Importe
-- Generación automática de PDF por profesional
+- Filtrado de operaciones por categoría del profesional
+- Procesamiento independiente por categoría
+- Generación automática de PDF por profesional y categoría
+- Evita sobrescritura de archivos generando un PDF por cada categoría
+- Sanitización automática de nombres de archivo para compatibilidad con Windows
+- Control de procesamiento:
+  - Eliminación automática de categorías ya procesadas
+  - Eliminación del profesional cuando se completan todas sus categorías
+- Opción manual para quitar profesionales de la lista “A procesar”
 - Inclusión en el PDF de:
   - Logo institucional
   - Datos del proveedor
@@ -27,6 +35,7 @@ Este sistema permite cargar una base de datos de movimientos financieros, selecc
   - Observaciones
   - Fecha de procesamiento editable
   - Firmas digitales
+- Paginación automática del PDF para evitar superposición de contenido
 - Selección de carpeta de guardado persistente durante la sesión
 
 ## Tecnologías utilizadas
